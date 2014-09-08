@@ -33,7 +33,7 @@ public class StreamEngine {
 	public static void main(String[] args) {
 		StreamEngine se = new StreamEngine();
 		
-		String expression = "select timestamp, avg(price) from kk.stream.event.OrderEvent.win:ext_timed_batch(timestamp, 10 sec)";
+		String expression = "select current_timestamp as timestamp, avg(price) from kk.stream.event.OrderEvent.win:time_batch(10 sec, 5000L)";
 		se.subscribe(expression, new OrderListener());
 		
 		@SuppressWarnings("deprecation")
@@ -46,13 +46,13 @@ public class StreamEngine {
 			OrderEvent e = new OrderEvent(time, "AirTicket", 500 + rd.nextInt(1000));
 			se.sendEvent(e);
 			
-			/*try {
+			try {
 				Thread.sleep(100);
 			} catch (InterruptedException ex) {
 				ex.printStackTrace();
-			}*/
+			}
 			
-			time += 100; // Simulate time passing with ext_timed_batch
+			time += 100; // Simulate time passing for ext_timed_batch
 		}
 	}
 }
