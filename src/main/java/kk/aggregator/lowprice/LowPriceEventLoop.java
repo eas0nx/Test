@@ -129,10 +129,8 @@ public class LowPriceEventLoop {
 		}
 		
 		private void purgeBuffer() {
-			currBuffer.merge(prevBuffer);
-			
 			// Send immutable buffer to cache updater
-			updater.updateAsync(Collections.unmodifiableMap(currBuffer));
+			updater.updateAsync(Collections.unmodifiableMap(prevBuffer), Collections.unmodifiableMap(currBuffer));
 			
 			// From now on, prevBuffer should NOT be modified
 			prevBuffer = currBuffer;
