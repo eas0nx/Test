@@ -1,6 +1,8 @@
 package kk.aggregator.lowprice;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -21,8 +23,8 @@ public class LowPriceEventLoop {
 	private Thread processorThread;
 	
 	private long lastPurgeBufferTime;
-	private LowPriceBuffer currBuffer;
-	private LowPriceBuffer prevBuffer;
+	private Map<String, LowPriceEvent> currBuffer;
+	private Map<String, LowPriceEvent> prevBuffer;
 
 	private LowPriceCacheUpdater updater;
 	
@@ -65,7 +67,8 @@ public class LowPriceEventLoop {
 	@PostConstruct
 	public void init() {
 		this.eventQueue = new ArrayBlockingQueue<LowPriceEvent>(queueCapacity);
-		this.currBuffer = new LowPriceBuffer(bufferCapacity);
+		this.currBuffer = new HashMap<String, LowPriceEvent>(bufferCapacity);
+		this.prevBuffer = Collections.emptyMap();
 		
 		lastPurgeBufferTime = System.currentTimeMillis();
 		processorThread = new Thread(new EventProcessor(), "LowPriceEventProcessor");
@@ -115,7 +118,7 @@ public class LowPriceEventLoop {
 			}
 		}
 		
-		private boolean isFull(LowPriceBuffer buffer) {
+		private boolean isFull(Map<String, LowPriceEvent> buffer) {
 			return buffer.size() >= bufferCapacity;
 		}
 		
@@ -134,7 +137,7 @@ public class LowPriceEventLoop {
 			
 			// From now on, prevBuffer should NOT be modified
 			prevBuffer = currBuffer;
-			currBuffer = new LowPriceBuffer(bufferCapacity);
+			currBuffer = new HashMap<String, LowPriceEvent>(bufferCapacity);
 		}
 	}
 }

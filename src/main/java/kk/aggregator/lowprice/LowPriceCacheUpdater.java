@@ -29,5 +29,16 @@ public class LowPriceCacheUpdater {
 	private void doUpdate(Map<String, LowPriceEvent> prevBuffer, Map<String, LowPriceEvent> currBuffer) {
 		System.out.printf("%s - buffer size: %d", new Date(), currBuffer.size());
 		System.out.println();
+		
+		for (Map.Entry<String, LowPriceEvent> cur : currBuffer.entrySet()) {
+			LowPriceEvent lpe = cur.getValue();
+			
+			LowPriceEvent other = prevBuffer.get(cur.getKey());
+			if (other != null && other.getSalesPrice() < cur.getValue().getSalesPrice()) {
+				lpe = other;
+			}
+			
+			// TODO Update lpe to Redis cache
+		}
 	}
 }
